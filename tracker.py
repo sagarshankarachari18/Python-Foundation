@@ -1,6 +1,17 @@
-expenses = []
+import os
 
-print("---Hello Sagar, Welcome Back,---")
+FILE_NAME = r"D:\GitHub-Projects\Python_foundation\expenses.txt"
+
+expenses = []
+if os.path.exists(FILE_NAME):
+    with open(FILE_NAME, "r")as file:
+        for line in file:
+            if not line.strip():
+                continue
+            name, amount = line.strip().split(",")
+            expenses.append({"name": name, "amount": float(amount)})
+
+print("---Hello Sagar, Welcome to your Expense Tracker,---")
 
 while True:
     print("\nOptions: 1. Add Expense | 2. show Total | 3. Exit")
@@ -10,7 +21,11 @@ while True:
         name = input("Enter expense name: ")
         amount = float(input("Enter amount €: "))
         expenses.append({"name": name, "amount": amount})
-        print(f"Added: {name} (€{amount})")
+
+        with open(FILE_NAME, "a") as file:
+            file.write(f"{name},{amount}\n")
+
+        print(f"saved: {name} (€{amount})")
 
     elif choice == "2":
         total = sum(item["amount"]for item in expenses)
