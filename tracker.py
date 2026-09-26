@@ -1,16 +1,35 @@
 import os
 
-FILE_NAME = r"D:\GitHub-Projects\Python_foundation\expenses.txt"
+FILE_NAME = "expenses.txt"
 
-expenses = []
-if os.path.exists(FILE_NAME):
-    with open(FILE_NAME, "r")as file:
-        for line in file:
-            if not line.strip():
+def load_expenses():
+    expenses = []
+    if os.path.exists(FILE_NAME):
+        with open(FILE_NAME, "r") as file:
+            for line in file:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    name, amount = line.rsplit(",", 1)
+                    expenses.append({"name": name, "amount": float(amount)})
+                except ValueError:
+                    continue
+    return expenses
+
+def get_valid_amount():
+    while True:
+        try:
+            amount = float(input("Enter amount €: "))
+            if amount < 0:
+                print("Amount cannot be negative. Try again.")
                 continue
-            name, amount = line.strip().split(",")
-            expenses.append({"name": name, "amount": float(amount)})
+            return amount
+        except ValueError:
+            print("Invalid input. Please enter a valid numerical amount.")
 
+#Main Program
+expenses = load_expenses()
 print("---Hello Sagar, Welcome to your Expense Tracker,---")
 
 while True:
@@ -19,19 +38,23 @@ while True:
 
     if choice == "1":
         name = input("Enter expense name: ")
-        amount = float(input("Enter amount €: "))
+        amount = get_valid_amount()
+
         expenses.append({"name": name, "amount": amount})
 
         with open(FILE_NAME, "a") as file:
             file.write(f"{name},{amount}\n")
 
-        print(f"saved: {name} (€{amount})")
+        print(f"saved: {name} (€{amount:.2f})")
 
     elif choice == "2":
-        total = sum(item["amount"]for item in expenses)
-        print(f"\n Total Expenses: €{total: .2f}")
+        if not expenses:
+            print("\nNo Expenses logged yet.")
+            continue
+
+        total = sum(item["amount"] for item in expenses)
         for item in expenses:
-            print(f" -{item['name']}: €{item['amount']: .2f}")
+            print(f" -{item['name']}: €{item['amount']:.2f}")
 
     elif choice == "3":
         print("Goodbye! Sagar, Happy Saving.")
