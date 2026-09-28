@@ -1,21 +1,21 @@
+import json
 import os
 
-FILE_NAME = "expenses.txt"
+FILE_NAME = "expenses.json"
 
 def load_expenses():
-    expenses = []
+    """Load expense list from a JSON file."""
     if os.path.exists(FILE_NAME):
-        with open(FILE_NAME, "r") as file:
-            for line in file:
-                line = line.strip()
-                if not line:
-                    continue
-                try:
-                    name, amount = line.rsplit(",", 1)
-                    expenses.append({"name": name, "amount": float(amount)})
-                except ValueError:
-                    continue
-    return expenses
+        try:
+            with open(FILE_NAME, "r") as file:
+                return json.load(file)
+        except (json.JSONDecodeError, ValueError):
+            return []
+    return []
+
+def save_expenses(expenses):
+    with open(FILE_NAME, "w") as file:
+        json.dump(expenses, file, indent=4)
 
 def get_valid_amount():
     while True:
@@ -28,36 +28,35 @@ def get_valid_amount():
         except ValueError:
             print("Invalid input. Please enter a valid numerical amount.")
 
-#Main Program
+# Main Program
 expenses = load_expenses()
-print("---Hello Sagar, Welcome to your Expense Tracker,---")
+print("--- Hello Sagar, Welcome to your Expense Tracker ---")
 
 while True:
-    print("\nOptions: 1. Add Expense | 2. show Total | 3. Exit")
-    choice = input("choose an option (1-3): ")
+    print("\nOptions: 1. Add Expense | 2. Show Total | 3. Exit")
+    choice = input("Choose an option (1-3): ").strip()
 
     if choice == "1":
-        name = input("Enter expense name: ")
+        name = input("Enter expense name: ").strip()
         amount = get_valid_amount()
 
         expenses.append({"name": name, "amount": amount})
+        save_expenses(expenses)
 
-        with open(FILE_NAME, "a") as file:
-            file.write(f"{name},{amount}\n")
-
-        print(f"saved: {name} (€{amount:.2f})")
+        print(f"Saved: {name} (€{amount:.2f})")
 
     elif choice == "2":
         if not expenses:
-            print("\nNo Expenses logged yet.")
+            print("\nNo expenses logged yet.")
             continue
 
         total = sum(item["amount"] for item in expenses)
+        print(f"\nTotal Expenses: €{total:.2f}")
         for item in expenses:
-            print(f" -{item['name']}: €{item['amount']:.2f}")
+            print(f" - {item['name']}: €{item['amount']:.2f}")
 
     elif choice == "3":
-        print("Goodbye! Sagar, Happy Saving.")
+        print("Goodbye Sagar! Happy Saving.")
         break
     else:
-        print("Invalid option. Please try again")
+        print("Invalid option. Please try again.")
